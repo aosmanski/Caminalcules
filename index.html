@@ -60,8 +60,9 @@
         }
         .caminalcule-image.dragging {
             position: absolute;
-        }	
-
+            opacity: 0.8;
+        }
+		
     </style>
 </head>
 <body>
@@ -152,22 +153,22 @@
                 <span>1</span>
                 <span>2</span>
                 <span>3</span>
-		<span>4</span>
-		<span>5</span>
-		<span>6</span>
-		<span>7</span>
-		<span>8</span>
-		<span>9</span>
-		<span>10</span>
-		<span>11</span>
-		<span>12</span>
-		<span>13</span>
-		<span>14</span>
-		<span>15</span>
-		<span>16</span>
-		<span>17</span>
-		<span>18</span>
-		<span>19</span>
+                <span>4</span>
+                <span>5</span>
+                <span>6</span>
+                <span>7</span>
+                <span>8</span>
+                <span>9</span>
+                <span>10</span>
+                <span>11</span>
+                <span>12</span>
+                <span>13</span>
+                <span>14</span>
+                <span>15</span>
+                <span>16</span>
+                <span>17</span>
+                <span>18</span>
+                <span>19</span>
 
             </div>
             <canvas id="timeline-canvas"></canvas>
@@ -180,6 +181,8 @@
     </div>
 
     <script>
+        const caminalculeBank = document.querySelector('.caminalcule-bank');
+        const evolutionaryTimeline = document.querySelector('.evolutionary-timeline');
         const caminalculeImages = document.querySelectorAll('.caminalcule-image');
         const timelineCanvas = document.getElementById('timeline-canvas');
         const drawingModeBtn = document.getElementById('drawing-mode-btn');
@@ -198,8 +201,18 @@
             const offsetY = event.clientY - image.getBoundingClientRect().top;
 
             function moveDragging(event) {
-                image.style.left = event.clientX - offsetX + 'px';
-                image.style.top = event.clientY - offsetY + 'px';
+                const x = event.clientX - offsetX;
+                const y = event.clientY - offsetY;
+                image.style.left = x + 'px';
+                image.style.top = y + 'px';
+
+                if (isImageInTimeline(image)) {
+                    image.remove();
+                    evolutionaryTimeline.appendChild(image);
+                } else {
+                    image.remove();
+                    caminalculeBank.appendChild(image);
+                }
             }
 
             function stopDragging() {
@@ -212,6 +225,17 @@
             document.addEventListener('mouseup', stopDragging);
         }
 
+        function isImageInTimeline(image) {
+            const timelineRect = evolutionaryTimeline.getBoundingClientRect();
+            const imageRect = image.getBoundingClientRect();
+            return (
+                imageRect.left >= timelineRect.left &&
+                imageRect.right <= timelineRect.right &&
+                imageRect.top >= timelineRect.top &&
+                imageRect.bottom <= timelineRect.bottom
+            );
+        }
+		
         drawingModeBtn.addEventListener('click', () => {
             isDrawingMode = !isDrawingMode;
             drawingModeBtn.textContent = isDrawingMode ? 'Exit Cladogram Drawing Mode' : 'Enter Cladogram Drawing Mode';
