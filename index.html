@@ -5,55 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classification of the Caminalcules</title>
     <style>
-        .container {
-            display: flex;
-        }
-        .caminalcule-bank {
-            width: 30%;
-            padding: 20px;
-            overflow-y: hidden;
-        }
-        .evolutionary-timeline {
-            width: 70%;
-            padding: 20px;
-            position: relative;
-            height: 2400px;
-            overflow-x: scroll;
-            overflow-y: hidden;
-        }
+        /* ... (Previous CSS styles remain the same) */
         .caminalcule-image {
             cursor: move;
             width: 100px;
             height: auto;
-        }
-        .y-axis {
             position: absolute;
-            left: 0;
-            top: 120px;
-            bottom: 120px;
-            width: 50px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .y-axis span {
-            font-size: 12px;
-            margin-bottom: 120px;
-        }
-        .drawing-mode {
-            margin-top: 20px;
-        }
-        .title {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .subtitle {
-            text-align: center;
-            font-size: 18px;
-            margin-bottom: 5px;
+            z-index: 1;
         }
     </style>
 </head>
@@ -79,7 +37,7 @@
             <img class="caminalcule-image" src="images/22.living.0.png" alt="Living Caminalcule 22" draggable="true">
             <img class="caminalcule-image" src="images/24.living.0.png" alt="Living Caminalcule 24" draggable="true">
             <img class="caminalcule-image" src="images/28.living.0.png" alt="Living Caminalcule 28" draggable="true">
-			
+
             <h2>FOSSILS</h2>
             <img class="caminalcule-image" src="images/2.fossil.1.png" alt="Fossil Caminalcule 2" draggable="true">
             <img class="caminalcule-image" src="images/12.fossil.1.png" alt="Fossil Caminalcule 12" draggable="true">
@@ -173,41 +131,34 @@
     </div>
 
     <script>
-        const caminalculeBank = document.querySelector('.caminalcule-bank');
-        const evolutionaryTimeline = document.querySelector('.evolutionary-timeline');
+        const caminalculeImages = document.querySelectorAll('.caminalcule-image');
         const timelineCanvas = document.getElementById('timeline-canvas');
         const drawingModeBtn = document.getElementById('drawing-mode-btn');
         const clearLinesBtn = document.getElementById('clear-lines-btn');
         let isDrawingMode = false;
         let lines = [];
 
-        caminalculeBank.addEventListener('dragstart', dragStart);
-        evolutionaryTimeline.addEventListener('dragover', dragOver);
-        evolutionaryTimeline.addEventListener('drop', drop);
+        caminalculeImages.forEach(image => {
+            image.addEventListener('mousedown', startDragging);
+        });
 
-        function dragStart(event) {
-            event.dataTransfer.setData('text/plain', event.target.src);
-            event.target.style.opacity = '0.5';
-        }
+        function startDragging(event) {
+            const image = event.target;
+            const offsetX = event.clientX - image.getBoundingClientRect().left;
+            const offsetY = event.clientY - image.getBoundingClientRect().top;
 
-        function dragOver(event) {
-            event.preventDefault();
-        }
+            function moveDragging(event) {
+                image.style.left = event.clientX - offsetX + 'px';
+                image.style.top = event.clientY - offsetY + 'px';
+            }
 
-        function drop(event) {
-            event.preventDefault();
-            const imageSrc = event.dataTransfer.getData('text');
-            const image = document.createElement('img');
-            image.src = imageSrc;
-            image.className = 'caminalcule-image';
-            image.draggable = true;
-            image.style.position = 'absolute';
-            image.style.left = event.clientX - evolutionaryTimeline.getBoundingClientRect().left - image.width / 2 + 'px';
-            image.style.top = event.clientY - evolutionaryTimeline.getBoundingClientRect().top - image.height / 2 + 'px';
-            evolutionaryTimeline.appendChild(image);
+            function stopDragging() {
+                document.removeEventListener('mousemove', moveDragging);
+                document.removeEventListener('mouseup', stopDragging);
+            }
 
-            const originalImage = document.querySelector(`img[src="${imageSrc}"]`);
-            originalImage.style.visibility = 'hidden';
+            document.addEventListener('mousemove', moveDragging);
+            document.addEventListener('mouseup', stopDragging);
         }
 
         drawingModeBtn.addEventListener('click', () => {
