@@ -5,23 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Caminalcule Activity</title>
     <style>
-        /* Add your CSS styles here */
         .container {
             display: flex;
         }
         .caminalcule-bank {
             width: 30%;
             padding: 20px;
+            overflow-y: scroll;
+            max-height: 600px;
         }
         .evolutionary-timeline {
             width: 70%;
             padding: 20px;
-            background-image: linear-gradient(to bottom, #fff, #fff 98%, #000 98%, #000 100%);
-            background-size: 100% 5.26%;
-            background-repeat: repeat-y;
+            position: relative;
+            height: 600px;
         }
         .caminalcule-image {
             cursor: move;
+            width: 100px;
+            height: auto;
+        }
+        .y-axis {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .y-axis span {
+            font-size: 12px;
+        }
+        .drawing-mode {
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -43,6 +62,7 @@
             <img class="caminalcule-image" src="images/22.living.0.png" alt="Living Caminalcule 22" draggable="true">
             <img class="caminalcule-image" src="images/24.living.0.png" alt="Living Caminalcule 24" draggable="true">
             <img class="caminalcule-image" src="images/28.living.0.png" alt="Living Caminalcule 28" draggable="true">
+
 
             <h2>FOSSILS</h2>
             <img class="caminalcule-image" src="images/2.fossil.1.png" alt="Fossil Caminalcule 2" draggable="true">
@@ -104,24 +124,51 @@
 
         </div>
         <div class="evolutionary-timeline">
-            <!-- This is where the Caminalcule images will be dropped -->
+            <div class="y-axis">
+                <span>0</span>
+                <span>1</span>
+                <span>2</span>
+                <span>3</span>
+				<span>4</span>
+				<span>5</span>
+				<span>6</span>
+				<span>7</span>
+				<span>8</span>
+				<span>9</span>
+				<span>10</span>
+				<span>11</span>
+				<span>12</span>
+				<span>13</span>
+				<span>14</span>
+				<span>15</span>
+				<span>16</span>
+				<span>17</span>
+				<span>18</span>
+				<span>19</span>
+				
+            </div>
+            <canvas id="timeline-canvas"></canvas>
         </div>
     </div>
 
+    <div class="drawing-mode">
+        <button id="drawing-mode-btn">Enter Cladogram Drawing Mode</button>
+    </div>
+
     <script>
-        // Add your JavaScript code here
-        const caminalculeImages = document.querySelectorAll('.caminalcule-image');
+        const caminalculeBank = document.querySelector('.caminalcule-bank');
         const evolutionaryTimeline = document.querySelector('.evolutionary-timeline');
+        const timelineCanvas = document.getElementById('timeline-canvas');
+        const drawingModeBtn = document.getElementById('drawing-mode-btn');
+        let isDrawingMode = false;
 
-        caminalculeImages.forEach(image => {
-            image.addEventListener('dragstart', dragStart);
-        });
-
+        caminalculeBank.addEventListener('dragstart', dragStart);
         evolutionaryTimeline.addEventListener('dragover', dragOver);
         evolutionaryTimeline.addEventListener('drop', drop);
 
         function dragStart(event) {
-            event.dataTransfer.setData('text/plain', event.target.id);
+            event.dataTransfer.setData('text/plain', event.target.src);
+            event.target.style.opacity = '0.5';
         }
 
         function dragOver(event) {
@@ -130,10 +177,62 @@
 
         function drop(event) {
             event.preventDefault();
-            const imageId = event.dataTransfer.getData('text');
-            const image = document.getElementById(imageId);
-            event.target.appendChild(image);
+            const imageSrc = event.dataTransfer.getData('text');
+            const image = document.createElement('img');
+            image.src = imageSrc;
+            image.className = 'caminalcule-image';
+            image.draggable = true;
+            image.style.position = 'absolute';
+            image.style.left = event.clientX - evolutionaryTimeline.offsetLeft - image.width / 2 + 'px';
+            image.style.top = event.clientY - evolutionaryTimeline.offsetTop - image.height / 2 + 'px';
+            evolutionaryTimeline.appendChild(image);
+
+            const originalImage = document.querySelector(`img[src="${imageSrc}"]`);
+            originalImage.remove();
         }
+
+        drawingModeBtn.addEventListener('click', () => {
+            isDrawingMode = !isDrawingMode;
+            drawingModeBtn.textContent = isDrawingMode ? 'Exit Cladogram Drawing Mode' : 'Enter Cladogram Drawing Mode';
+        });
+
+        timelineCanvas.addEventListener('mousedown', startDrawing);
+        timelineCanvas.addEventListener('mousemove', draw);
+        timelineCanvas.addEventListener('mouseup', stopDrawing);
+        timelineCanvas.addEventListener('mouseout', stopDrawing);
+
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        function startDrawing(event) {
+            if (isDrawingMode) {
+                isDrawing = true;
+                [lastX, lastY] = [event.offsetX, event.offsetY];
+            }
+        }
+
+        function draw(event) {
+            if (!isDrawing) return;
+            const ctx = timelineCanvas.getContext('2d');
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(event.offsetX, event.offsetY);
+            ctx.stroke();
+            [lastX, lastY] = [event.offsetX, event.offsetY];
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function resizeCanvas() {
+            timelineCanvas.width = evolutionaryTimeline.offsetWidth;
+            timelineCanvas.height = evolutionaryTimeline.offsetHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
     </script>
 </body>
 </html>
