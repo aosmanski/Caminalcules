@@ -55,7 +55,12 @@
     <div class="title">Classification of the Caminalcules</div>
     <div class="subtitle">Invented by Joseph H. Camin</div>
     <div class="subtitle">Webpage created by Austin B. Osmanski</div>
-
+    
+    <div class="drawing-mode">
+        <button id="drawing-mode-btn">Enter Cladogram Drawing Mode</button>
+        <button id="clear-lines-btn">Clear Lines</button>
+    </div>
+    
     <div class="evolutionary-timeline">
         <div class="y-axis">
             <span>0</span>
@@ -153,12 +158,7 @@
         <img class="caminalcule-image" src="images/58.fossil.18.png" alt="Fossil Caminalcule 58" draggable="true" data-mya="18">
         <img class="caminalcule-image" src="images/74.fossil.18.png" alt="Fossil Caminalcule 74" draggable="true" data-mya="18">
         <img class="caminalcule-image" src="images/73.fossil.19.png" alt="Fossil Caminalcule 73" draggable="true" data-mya="19">
-
-    <div class="drawing-mode">
-        <button id="drawing-mode-btn">Enter Cladogram Drawing Mode</button>
-        <button id="clear-lines-btn">Clear Lines</button>
-    </div>
-    
+ 
     <script>
         const caminalculeImages = document.querySelectorAll('.caminalcule-image');
         const timelineCanvas = document.getElementById('timeline-canvas');
@@ -174,21 +174,24 @@
             image.addEventListener('mousedown', startDragging);
         });
     
+
         function startDragging(event) {
             const image = event.target;
             const offsetX = event.clientX - image.getBoundingClientRect().left;
             const offsetY = event.clientY - image.getBoundingClientRect().top;
-    
+
             function moveDragging(event) {
-                image.style.left = event.clientX - offsetX + 'px';
-                image.style.top = event.clientY - offsetY + 'px';
+                const scrollX = window.scrollX || window.pageXOffset;
+                const scrollY = window.scrollY || window.pageYOffset;
+                image.style.left = event.clientX - offsetX + scrollX + 'px';
+                image.style.top = event.clientY - offsetY + scrollY + 'px';
             }
-    
+
             function stopDragging() {
                 document.removeEventListener('mousemove', moveDragging);
                 document.removeEventListener('mouseup', stopDragging);
             }
-    
+
             document.addEventListener('mousemove', moveDragging);
             document.addEventListener('mouseup', stopDragging);
         }
