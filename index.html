@@ -26,7 +26,7 @@
         }
         .y-axis span {
             font-size: 18px;
-            margin-bottom: 104px;
+            margin-bottom: 208px;
         }
         .drawing-mode {
             margin-top: 20px;
@@ -169,7 +169,7 @@
     
         caminalculeImages.forEach((image) => {
             const mya = parseInt(image.dataset.mya);
-            image.style.top = `${120 + mya * 104}px`;
+            image.style.top = `${120 + mya * 208}px`;
             image.style.left = '60px';
             image.addEventListener('mousedown', startDragging);
         });
