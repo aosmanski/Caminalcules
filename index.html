@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Caminalcule Activity</title>
+    <title>Classification of the Caminalcules</title>
     <style>
         .container {
             display: flex;
@@ -11,16 +11,15 @@
         .caminalcule-bank {
             width: 30%;
             padding: 20px;
-            overflow-y: scroll;
-            max-height: 600px;
+            overflow-y: hidden;
         }
         .evolutionary-timeline {
             width: 70%;
             padding: 20px;
             position: relative;
-            height: 1200px;
+            height: 2400px;
             overflow-x: scroll;
-            overflow-y: scroll;
+            overflow-y: hidden;
         }
         .caminalcule-image {
             cursor: move;
@@ -30,8 +29,8 @@
         .y-axis {
             position: absolute;
             left: 0;
-            top: 0;
-            bottom: 0;
+            top: 120px;
+            bottom: 120px;
             width: 50px;
             display: flex;
             flex-direction: column;
@@ -40,14 +39,29 @@
         }
         .y-axis span {
             font-size: 12px;
-            margin-bottom: 60px;
+            margin-bottom: 120px;
         }
         .drawing-mode {
             margin-top: 20px;
         }
+        .title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 <body>
+    <div class="title">Classification of the Caminalcules</div>
+    <div class="subtitle">Invented by Joseph H. Camin</div>
+    <div class="subtitle">Webpage created by Austin B. Osmanski</div>
+
     <div class="container">
         <div class="caminalcule-bank">
             <h2>LIVING</h2>
@@ -65,7 +79,7 @@
             <img class="caminalcule-image" src="images/22.living.0.png" alt="Living Caminalcule 22" draggable="true">
             <img class="caminalcule-image" src="images/24.living.0.png" alt="Living Caminalcule 24" draggable="true">
             <img class="caminalcule-image" src="images/28.living.0.png" alt="Living Caminalcule 28" draggable="true">
-
+			
             <h2>FOSSILS</h2>
             <img class="caminalcule-image" src="images/2.fossil.1.png" alt="Fossil Caminalcule 2" draggable="true">
             <img class="caminalcule-image" src="images/12.fossil.1.png" alt="Fossil Caminalcule 12" draggable="true">
@@ -131,23 +145,23 @@
                 <span>1</span>
                 <span>2</span>
                 <span>3</span>
-		<span>4</span>
-		<span>5</span>
-		<span>6</span>
-		<span>7</span>
-		<span>8</span>
-		<span>9</span>
-		<span>10</span>
-		<span>11</span>
-		<span>12</span>
-		<span>13</span>
-		<span>14</span>
-		<span>15</span>
-		<span>16</span>
-		<span>17</span>
-		<span>18</span>
-		<span>19</span>
-				
+				<span>4</span>
+				<span>5</span>
+				<span>6</span>
+				<span>7</span>
+				<span>8</span>
+				<span>9</span>
+				<span>10</span>
+				<span>11</span>
+				<span>12</span>
+				<span>13</span>
+				<span>14</span>
+				<span>15</span>
+				<span>16</span>
+				<span>17</span>
+				<span>18</span>
+				<span>19</span>
+
             </div>
             <canvas id="timeline-canvas"></canvas>
         </div>
@@ -193,7 +207,7 @@
             evolutionaryTimeline.appendChild(image);
 
             const originalImage = document.querySelector(`img[src="${imageSrc}"]`);
-            originalImage.remove();
+            originalImage.style.visibility = 'hidden';
         }
 
         drawingModeBtn.addEventListener('click', () => {
@@ -261,4 +275,4 @@
         resizeCanvas();
     </script>
 </body>
-</html>
+</html>  
