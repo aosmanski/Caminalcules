@@ -25,8 +25,12 @@
             cursor: move;
             width: 100px;
             height: auto;
-            position: absolute;
+            position: relative;
             z-index: 1;
+            margin-bottom: 10px;
+        }
+        .caminalcule-image.dragging {
+            position: absolute;
         }
         .y-axis {
             position: absolute;
@@ -148,22 +152,22 @@
                 <span>1</span>
                 <span>2</span>
                 <span>3</span>
-				<span>4</span>
-				<span>5</span>
-				<span>6</span>
-				<span>7</span>
-				<span>8</span>
-				<span>9</span>
-				<span>10</span>
-				<span>11</span>
-				<span>12</span>
-				<span>13</span>
-				<span>14</span>
-				<span>15</span>
-				<span>16</span>
-				<span>17</span>
-				<span>18</span>
-				<span>19</span>
+		<span>4</span>
+		<span>5</span>
+		<span>6</span>
+		<span>7</span>
+		<span>8</span>
+		<span>9</span>
+		<span>10</span>
+		<span>11</span>
+		<span>12</span>
+		<span>13</span>
+		<span>14</span>
+		<span>15</span>
+		<span>16</span>
+		<span>17</span>
+		<span>18</span>
+		<span>19</span>
 
             </div>
             <canvas id="timeline-canvas"></canvas>
@@ -189,6 +193,7 @@
 
         function startDragging(event) {
             const image = event.target;
+            image.classList.add('dragging');
             const offsetX = event.clientX - image.getBoundingClientRect().left;
             const offsetY = event.clientY - image.getBoundingClientRect().top;
 
@@ -198,6 +203,7 @@
             }
 
             function stopDragging() {
+                image.classList.remove('dragging');
                 document.removeEventListener('mousemove', moveDragging);
                 document.removeEventListener('mouseup', stopDragging);
             }
@@ -205,7 +211,7 @@
             document.addEventListener('mousemove', moveDragging);
             document.addEventListener('mouseup', stopDragging);
         }
-
+	    
         drawingModeBtn.addEventListener('click', () => {
             isDrawingMode = !isDrawingMode;
             drawingModeBtn.textContent = isDrawingMode ? 'Exit Cladogram Drawing Mode' : 'Enter Cladogram Drawing Mode';
