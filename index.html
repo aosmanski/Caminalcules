@@ -21,17 +21,6 @@
             overflow-x: scroll;
             overflow-y: hidden;
         }
-        .caminalcule-image {
-            cursor: move;
-            width: 100px;
-            height: auto;
-            position: relative;
-            z-index: 1;
-            margin-bottom: 10px;
-        }
-        .caminalcule-image.dragging {
-            position: absolute;
-        }
         .y-axis {
             position: absolute;
             left: 0;
@@ -61,6 +50,17 @@
             font-size: 18px;
             margin-bottom: 5px;
         }
+        .caminalcule-image {
+            cursor: move;
+            width: 100px;
+            height: auto;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 10px;
+        }
+        .caminalcule-image.dragging {
+            position: absolute;
+        }	
 
     </style>
 </head>
@@ -211,7 +211,7 @@
             document.addEventListener('mousemove', moveDragging);
             document.addEventListener('mouseup', stopDragging);
         }
-	    
+
         drawingModeBtn.addEventListener('click', () => {
             isDrawingMode = !isDrawingMode;
             drawingModeBtn.textContent = isDrawingMode ? 'Exit Cladogram Drawing Mode' : 'Enter Cladogram Drawing Mode';
