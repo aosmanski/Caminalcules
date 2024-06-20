@@ -9,15 +9,19 @@
             width: 100%;
             padding: 20px;
             position: relative;
-            height: 2400px;
-            overflow-x: scroll;
-            overflow-y: auto;
+            height: 4000px; /* Increased height to accommodate all lines */
+        }
+        .timeline-line {
+            width: 100%;
+            height: 200px; /* Increased height for each line */
+            border-bottom: 1px solid #ccc;
+            position: relative;
         }
         .y-axis {
             position: absolute;
             left: 0;
-            top: 120px;
-            bottom: 120px;
+            top: 0;
+            bottom: 0;
             width: 50px;
             display: flex;
             flex-direction: column;
@@ -26,28 +30,22 @@
         }
         .y-axis span {
             font-size: 18px;
-            margin-bottom: 208px;
-        }
-        .drawing-mode {
-            margin-top: 20px;
-        }
-        .title {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .subtitle {
-            text-align: center;
-            font-size: 18px;
-            margin-bottom: 5px;
         }
         .caminalcule-image {
             cursor: move;
-            width: 100px;
+            width: 50px; /* Reduced size */
             height: auto;
             position: absolute;
             z-index: 1;
+        }
+        #drawing-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -62,129 +60,62 @@
     </div>
     
     <div class="evolutionary-timeline">
+        <canvas id="drawing-canvas"></canvas>
         <div class="y-axis">
-            <span>0</span>
-            <span>1</span>
-            <span>2</span>
-            <span>3</span>
-            <span>4</span>
-            <span>5</span>
-            <span>6</span>
-            <span>7</span>
-            <span>8</span>
-            <span>9</span>
-            <span>10</span>
-            <span>11</span>
-            <span>12</span>
-            <span>13</span>
-            <span>14</span>
-            <span>15</span>
-            <span>16</span>
-            <span>17</span>
-            <span>18</span>
-            <span>19</span>
+            <!-- Y-axis labels will be added dynamically -->
         </div>
-        <canvas id="timeline-canvas"></canvas>
-        <!-- Living Caminalcule images -->
-        <img class="caminalcule-image" src="images/1.living.0.png" alt="Living Caminalcule 1" draggable="true" data-mya="0">
-        <img class="caminalcule-image" src="images/2.living.0.png" alt="Living Caminalcule 2" draggable="true" data-mya="0">
-        <img class="caminalcule-image" src="images/3.living.0.png" alt="Living Caminalcule 3" draggable="true" data-mya="0">
-        <img class="caminalcule-image" src="images/4.living.0.png" alt="Living Caminalcule 4" draggable="true" data-mya="0">
-        <img class="caminalcule-image" src="images/9.living.0.png" alt="Living Caminalcule 9" draggable="true" data-mya="0">
-        <img class="caminalcule-image" src="images/12.living.0.png" alt="Living Caminalcule 12" draggable="true" data-mya="0">
-        <img class="caminalcule-image" src="images/13.living.0.png" alt="Living Caminalcule 13" draggable="true" data-mya="0">
-        <img class="caminalcule-image" src="images/14.living.0.png" alt="Living Caminalcule 14" draggable="true" data-mya="0">
-        <img class="caminalcule-image" src="images/16.living.0.png" alt="Living Caminalcule 16" draggable="true" data-mya="0">
-        <img class="caminalcule-image" src="images/19.living.0.png" alt="Living Caminalcule 19" draggable="true" data-mya="0">
-        <img class="caminalcule-image" src="images/20.living.0.png" alt="Living Caminalcule 20" draggable="true" data-mya="0">
-        <img class="caminalcule-image" src="images/22.living.0.png" alt="Living Caminalcule 22" draggable="true" data-mya="0">
-        <img class="caminalcule-image" src="images/24.living.0.png" alt="Living Caminalcule 24" draggable="true" data-mya="0">
-        <img class="caminalcule-image" src="images/28.living.0.png" alt="Living Caminalcule 28" draggable="true" data-mya="0">
-        
-        <!-- Fossil Caminalcule images -->
-        <img class="caminalcule-image" src="images/2.fossil.1.png" alt="Fossil Caminalcule 2" draggable="true" data-mya="1">
-        <img class="caminalcule-image" src="images/12.fossil.1.png" alt="Fossil Caminalcule 12" draggable="true" data-mya="1">
-        <img class="caminalcule-image" src="images/20.fossil.1.png" alt="Fossil Caminalcule 20" draggable="true" data-mya="1">
-        <img class="caminalcule-image" src="images/22.fossil.1.png" alt="Fossil Caminalcule 22" draggable="true" data-mya="1">
-        <img class="caminalcule-image" src="images/47.fossil.1.png" alt="Fossil Caminalcule 47" draggable="true" data-mya="1">
-        <img class="caminalcule-image" src="images/69.fossil.1.png" alt="Fossil Caminalcule 69" draggable="true" data-mya="1">
-        <img class="caminalcule-image" src="images/75.fossil.1.png" alt="Fossil Caminalcule 75" draggable="true" data-mya="1">
-        <img class="caminalcule-image" src="images/24.fossil.2.png" alt="Fossil Caminalcule 24" draggable="true" data-mya="2">
-        <img class="caminalcule-image" src="images/28.fossil.2.png" alt="Fossil Caminalcule 28" draggable="true" data-mya="2">
-        <img class="caminalcule-image" src="images/68.fossil.2.png" alt="Fossil Caminalcule 68" draggable="true" data-mya="2">
-        <img class="caminalcule-image" src="images/9.fossil.3.png" alt="Fossil Caminalcule 9" draggable="true" data-mya="3">
-        <img class="caminalcule-image" src="images/53.fossil.3.png" alt="Fossil Caminalcule 53" draggable="true" data-mya="3">
-        <img class="caminalcule-image" src="images/63.fossil.3.png" alt="Fossil Caminalcule 63" draggable="true" data-mya="3">
-        <img class="caminalcule-image" src="images/66.fossil.3.png" alt="Fossil Caminalcule 66" draggable="true" data-mya="3">
-        <img class="caminalcule-image" src="images/35.fossil.4.png" alt="Fossil Caminalcule 35" draggable="true" data-mya="4">
-        <img class="caminalcule-image" src="images/41.fossil.4.png" alt="Fossil Caminalcule 41" draggable="true" data-mya="4">
-        <img class="caminalcule-image" src="images/64.fossil.4.png" alt="Fossil Caminalcule 64" draggable="true" data-mya="4">
-        <img class="caminalcule-image" src="images/31.fossil.5.png" alt="Fossil Caminalcule 31" draggable="true" data-mya="5">
-        <img class="caminalcule-image" src="images/46.fossil.5.png" alt="Fossil Caminalcule 46" draggable="true" data-mya="5">
-        <img class="caminalcule-image" src="images/65.fossil.5.png" alt="Fossil Caminalcule 65" draggable="true" data-mya="5">
-        <img class="caminalcule-image" src="images/15.fossil.6.png" alt="Fossil Caminalcule 15" draggable="true" data-mya="6">
-        <img class="caminalcule-image" src="images/18.fossil.6.png" alt="Fossil Caminalcule 18" draggable="true" data-mya="6">
-        <img class="caminalcule-image" src="images/76.fossil.6.png" alt="Fossil Caminalcule 76" draggable="true" data-mya="6">
-        <img class="caminalcule-image" src="images/19.fossil.7.png" alt="Fossil Caminalcule 19" draggable="true" data-mya="7">
-        <img class="caminalcule-image" src="images/43.fossil.7.png" alt="Fossil Caminalcule 43" draggable="true" data-mya="7">
-        <img class="caminalcule-image" src="images/50.fossil.8.png" alt="Fossil Caminalcule 50" draggable="true" data-mya="8">
-        <img class="caminalcule-image" src="images/56.fossil.8.png" alt="Fossil Caminalcule 56" draggable="true" data-mya="8">
-        <img class="caminalcule-image" src="images/61.fossil.8.png" alt="Fossil Caminalcule 61" draggable="true" data-mya="8">
-        <img class="caminalcule-image" src="images/34.fossil.9.png" alt="Fossil Caminalcule 34" draggable="true" data-mya="9">
-        <img class="caminalcule-image" src="images/51.fossil.9.png" alt="Fossil Caminalcule 51" draggable="true" data-mya="9">
-        <img class="caminalcule-image" src="images/77.fossil.10.png" alt="Fossil Caminalcule 77" draggable="true" data-mya="10">
-        <img class="caminalcule-image" src="images/33.fossil.11.png" alt="Fossil Caminalcule 33" draggable="true" data-mya="11">
-        <img class="caminalcule-image" src="images/42.fossil.11.png" alt="Fossil Caminalcule 42" draggable="true" data-mya="11">
-        <img class="caminalcule-image" src="images/44.fossil.11.png" alt="Fossil Caminalcule 44" draggable="true" data-mya="11">
-        <img class="caminalcule-image" src="images/45.fossil.12.png" alt="Fossil Caminalcule 45" draggable="true" data-mya="12">
-        <img class="caminalcule-image" src="images/57.fossil.12.png" alt="Fossil Caminalcule 57" draggable="true" data-mya="12">
-        <img class="caminalcule-image" src="images/13.fossil.13.png" alt="Fossil Caminalcule 13" draggable="true" data-mya="13">
-        <img class="caminalcule-image" src="images/14.fossil.13.png" alt="Fossil Caminalcule 14" draggable="true" data-mya="13">
-        <img class="caminalcule-image" src="images/30.fossil.13.png" alt="Fossil Caminalcule 30" draggable="true" data-mya="13">
-        <img class="caminalcule-image" src="images/40.fossil.13.png" alt="Fossil Caminalcule 40" draggable="true" data-mya="13">
-        <img class="caminalcule-image" src="images/48.fossil.14.png" alt="Fossil Caminalcule 48" draggable="true" data-mya="14">
-        <img class="caminalcule-image" src="images/54.fossil.14.png" alt="Fossil Caminalcule 54" draggable="true" data-mya="14">
-        <img class="caminalcule-image" src="images/55.fossil.14.png" alt="Fossil Caminalcule 55" draggable="true" data-mya="14">
-        <img class="caminalcule-image" src="images/36.fossil.15.png" alt="Fossil Caminalcule 36" draggable="true" data-mya="15">
-        <img class="caminalcule-image" src="images/62.fossil.15.png" alt="Fossil Caminalcule 62" draggable="true" data-mya="15">
-        <img class="caminalcule-image" src="images/70.fossil.15.png" alt="Fossil Caminalcule 70" draggable="true" data-mya="15">
-        <img class="caminalcule-image" src="images/38.fossil.16.png" alt="Fossil Caminalcule 38" draggable="true" data-mya="16">
-        <img class="caminalcule-image" src="images/49.fossil.16.png" alt="Fossil Caminalcule 49" draggable="true" data-mya="16">
-        <img class="caminalcule-image" src="images/59.fossil.16.png" alt="Fossil Caminalcule 59" draggable="true" data-mya="16">
-        <img class="caminalcule-image" src="images/60.fossil.16.png" alt="Fossil Caminalcule 60" draggable="true" data-mya="16">
-        <img class="caminalcule-image" src="images/32.fossil.17.png" alt="Fossil Caminalcule 32" draggable="true" data-mya="17">
-        <img class="caminalcule-image" src="images/37.fossil.17.png" alt="Fossil Caminalcule 37" draggable="true" data-mya="17">
-        <img class="caminalcule-image" src="images/52.fossil.17.png" alt="Fossil Caminalcule 52" draggable="true" data-mya="17">
-        <img class="caminalcule-image" src="images/58.fossil.18.png" alt="Fossil Caminalcule 58" draggable="true" data-mya="18">
-        <img class="caminalcule-image" src="images/74.fossil.18.png" alt="Fossil Caminalcule 74" draggable="true" data-mya="18">
-        <img class="caminalcule-image" src="images/73.fossil.19.png" alt="Fossil Caminalcule 73" draggable="true" data-mya="19">
- 
+        <!-- Timeline lines and Caminalcule images will be added dynamically -->
+    </div>
+
     <script>
-        const caminalculeImages = document.querySelectorAll('.caminalcule-image');
-        const timelineCanvas = document.getElementById('timeline-canvas');
+        const evolutionaryTimeline = document.querySelector('.evolutionary-timeline');
+        const drawingCanvas = document.getElementById('drawing-canvas');
+        const ctx = drawingCanvas.getContext('2d');
         const drawingModeBtn = document.getElementById('drawing-mode-btn');
         const clearLinesBtn = document.getElementById('clear-lines-btn');
         let isDrawingMode = false;
-        let lines = [];
-    
-        caminalculeImages.forEach((image) => {
-            const mya = parseInt(image.dataset.mya);
-            image.style.top = `${120 + mya * 208}px`;
-            image.style.left = '60px';
+        let isDrawing = false;
+        let startX, startY;
+
+        // Create timeline lines and add Caminalcule images
+        for (let i = 0; i < 20; i++) {
+            const timelineLine = document.createElement('div');
+            timelineLine.className = 'timeline-line';
+            timelineLine.dataset.mya = i;
+            evolutionaryTimeline.appendChild(timelineLine);
+
+            const yAxisLabel = document.createElement('span');
+            yAxisLabel.textContent = i;
+            document.querySelector('.y-axis').appendChild(yAxisLabel);
+
+            // Add Caminalcule images to the appropriate line
+            caminalculeImages.forEach(image => {
+                if (parseInt(image.dataset.mya) === i) {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = image.src;
+                    imgElement.alt = image.alt;
+                    imgElement.className = 'caminalcule-image';
+                    imgElement.draggable = true;
+                    imgElement.dataset.mya = i;
+                    timelineLine.appendChild(imgElement);
+                }
+            });
+        }
+
+        // Make Caminalcule images draggable along their respective lines
+        const caminalculeImages = document.querySelectorAll('.caminalcule-image');
+        caminalculeImages.forEach(image => {
             image.addEventListener('mousedown', startDragging);
         });
-    
 
         function startDragging(event) {
             const image = event.target;
-            const offsetX = event.clientX - image.getBoundingClientRect().left;
-            const offsetY = event.clientY - image.getBoundingClientRect().top;
+            const timelineLine = image.closest('.timeline-line');
+            const initialX = event.clientX - image.getBoundingClientRect().left;
 
             function moveDragging(event) {
-                const scrollX = window.scrollX || window.pageXOffset;
-                const scrollY = window.scrollY || window.pageYOffset;
-                image.style.left = event.clientX - offsetX + scrollX + 'px';
-                image.style.top = event.clientY - offsetY + scrollY + 'px';
+                const newX = event.clientX - initialX - timelineLine.getBoundingClientRect().left;
+                image.style.left = `${Math.max(0, Math.min(newX, timelineLine.offsetWidth - image.offsetWidth))}px`;
             }
 
             function stopDragging() {
@@ -195,68 +126,49 @@
             document.addEventListener('mousemove', moveDragging);
             document.addEventListener('mouseup', stopDragging);
         }
-        
+
+        // Drawing functionality
         drawingModeBtn.addEventListener('click', () => {
             isDrawingMode = !isDrawingMode;
+            drawingCanvas.style.pointerEvents = isDrawingMode ? 'auto' : 'none';
             drawingModeBtn.textContent = isDrawingMode ? 'Exit Cladogram Drawing Mode' : 'Enter Cladogram Drawing Mode';
         });
-    
+
         clearLinesBtn.addEventListener('click', () => {
-            lines = [];
-            redrawLines();
+            ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
         });
-    
-        timelineCanvas.addEventListener('mousedown', startDrawing);
-        timelineCanvas.addEventListener('mouseup', stopDrawing);
-        timelineCanvas.addEventListener('mousemove', drawLine);
-    
-        let isDrawing = false;
-        let startX, startY, endX, endY;
-    
+
+        drawingCanvas.addEventListener('mousedown', startDrawing);
+        drawingCanvas.addEventListener('mousemove', draw);
+        drawingCanvas.addEventListener('mouseup', stopDrawing);
+
         function startDrawing(event) {
             if (isDrawingMode) {
                 isDrawing = true;
                 [startX, startY] = [event.offsetX, event.offsetY];
             }
         }
-    
-        function stopDrawing(event) {
-            if (isDrawing) {
-                isDrawing = false;
-                [endX, endY] = [event.offsetX, event.offsetY];
-                lines.push({ startX, startY, endX, endY });
-                redrawLines();
-            }
+
+        function draw(event) {
+            if (!isDrawing) return;
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(event.offsetX, event.offsetY);
+            ctx.strokeStyle = 'navy';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            [startX, startY] = [event.offsetX, event.offsetY];
         }
-    
-        function drawLine(event) {
-            if (isDrawing) {
-                redrawLines();
-                const ctx = timelineCanvas.getContext('2d');
-                ctx.beginPath();
-                ctx.moveTo(startX, startY);
-                ctx.lineTo(event.offsetX, event.offsetY);
-                ctx.stroke();
-            }
+
+        function stopDrawing() {
+            isDrawing = false;
         }
-    
-        function redrawLines() {
-            const ctx = timelineCanvas.getContext('2d');
-            ctx.clearRect(0, 0, timelineCanvas.width, timelineCanvas.height);
-            lines.forEach(line => {
-                ctx.beginPath();
-                ctx.moveTo(line.startX, line.startY);
-                ctx.lineTo(line.endX, line.endY);
-                ctx.stroke();
-            });
-        }
-    
+
         function resizeCanvas() {
-            timelineCanvas.width = evolutionaryTimeline.offsetWidth;
-            timelineCanvas.height = evolutionaryTimeline.offsetHeight;
-            redrawLines();
+            drawingCanvas.width = evolutionaryTimeline.offsetWidth;
+            drawingCanvas.height = evolutionaryTimeline.offsetHeight;
         }
-    
+
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
     </script>
