@@ -158,24 +158,34 @@
             const img = event.target;
             const timelineLine = img.closest('.timeline-line');
             const shiftX = event.clientX - img.getBoundingClientRect().left;
-
+        
             function moveAt(pageX) {
                 const newLeft = pageX - shiftX - timelineLine.getBoundingClientRect().left;
                 const minLeft = 60;
                 const maxLeft = timelineLine.offsetWidth - img.offsetWidth;
                 img.style.left = Math.max(minLeft, Math.min(newLeft, maxLeft)) + 'px';
             }
-
+        
             function onMouseMove(event) {
                 moveAt(event.pageX);
+        
+                // Check if the mouse is outside the timeline line
+                const timelineRect = timelineLine.getBoundingClientRect();
+                if (event.clientY < timelineRect.top || event.clientY > timelineRect.bottom) {
+                    stopDragging();
+                }
             }
-
-            document.addEventListener('mousemove', onMouseMove);
-
-            img.onmouseup = function() {
+        
+            function stopDragging() {
                 document.removeEventListener('mousemove', onMouseMove);
-                img.onmouseup = null;
-            };
+                document.removeEventListener('mouseup', stopDragging);
+            }
+        
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', stopDragging);
+        
+            // Prevent default drag behavior
+            event.preventDefault();
         }
 
         // Drawing functionality
