@@ -189,49 +189,99 @@
         }
 
         // Drawing functionality
+        let isDrawingMode = false;
+        let isDrawingLine = false;
+        let startImage = null;
+        let tempLine = null;
+        
         drawingModeBtn.addEventListener('click', () => {
             isDrawingMode = !isDrawingMode;
-            drawingCanvas.style.pointerEvents = isDrawingMode ? 'auto' : 'none';
             drawingModeBtn.textContent = isDrawingMode ? 'Exit Cladogram Drawing Mode' : 'Enter Cladogram Drawing Mode';
+            document.body.style.cursor = isDrawingMode ? 'crosshair' : 'default';
         });
-
+        
         clearLinesBtn.addEventListener('click', () => {
             ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
         });
-
-        drawingCanvas.addEventListener('mousedown', startDrawing);
-        drawingCanvas.addEventListener('mousemove', draw);
-        drawingCanvas.addEventListener('mouseup', stopDrawing);
-
-        function startDrawing(event) {
-            if (isDrawingMode) {
-                isDrawing = true;
-                [startX, startY] = [event.offsetX, event.offsetY];
+        
+        evolutionaryTimeline.addEventListener('click', (event) => {
+            if (!isDrawingMode) return;
+            
+            const clickedImage = event.target.closest('.caminalcule-image');
+            if (!clickedImage) return;
+        
+            if (!isDrawingLine) {
+                // Start drawing a new line
+                startImage = clickedImage;
+                isDrawingLine = true;
+                const rect = startImage.getBoundingClientRect();
+                const timelineRect = evolutionaryTimeline.getBoundingClientRect();
+                tempLine = {
+                    startX: rect.left + rect.width / 2 - timelineRect.left,
+                    startY: rect.top + rect.height / 2 - timelineRect.top,
+                    endX: rect.left + rect.width / 2 - timelineRect.left,
+                    endY: rect.top + rect.height / 2 - timelineRect.top
+                };
+            } else {
+                // Finish drawing the line
+                const endImage = clickedImage;
+                if (endImage.closest('.timeline-line') !== startImage.closest('.timeline-line')) {
+                    const rect = endImage.getBoundingClientRect();
+                    const timelineRect = evolutionaryTimeline.getBoundingClientRect();
+                    tempLine.endX = rect.left + rect.width / 2 - timelineRect.left;
+                    tempLine.endY = rect.top + rect.height / 2 - timelineRect.top;
+                    
+                    // Draw the final line
+                    ctx.beginPath();
+                    ctx.moveTo(tempLine.startX, tempLine.startY);
+                    ctx.lineTo(tempLine.endX, tempLine.endY);
+                    ctx.strokeStyle = 'navy';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+                isDrawingLine = false;
+                startImage = null;
+                tempLine = null;
+            }
+        });
+        
+        evolutionaryTimeline.addEventListener('mousemove', (event) => {
+            if (!isDrawingMode || !isDrawingLine) return;
+        
+            const timelineRect = evolutionaryTimeline.getBoundingClientRect();
+            tempLine.endX = event.clientX - timelineRect.left;
+            tempLine.endY = event.clientY - timelineRect.top;
+            
+            // Redraw all lines including the temporary one
+            redrawLines();
+        });
+        
+        function redrawLines() {
+            ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+            
+            // Redraw all permanent lines (you'll need to store these somewhere)
+            // For example: lines.forEach(line => drawLine(line));
+            
+            // Draw the temporary line if it exists
+            if (tempLine) {
+                ctx.beginPath();
+                ctx.moveTo(tempLine.startX, tempLine.startY);
+                ctx.lineTo(tempLine.endX, tempLine.endY);
+                ctx.strokeStyle = 'navy';
+                ctx.lineWidth = 2;
+                ctx.stroke();
             }
         }
-
-        function draw(event) {
-            if (!isDrawing) return;
+        
+        // You might want to add this function to draw individual lines
+        function drawLine(line) {
             ctx.beginPath();
-            ctx.moveTo(startX, startY);
-            ctx.lineTo(event.offsetX, event.offsetY);
+            ctx.moveTo(line.startX, line.startY);
+            ctx.lineTo(line.endX, line.endY);
             ctx.strokeStyle = 'navy';
             ctx.lineWidth = 2;
             ctx.stroke();
-            [startX, startY] = [event.offsetX, event.offsetY];
-        }
-
-        function stopDrawing() {
-            isDrawing = false;
-        }
-
-        function resizeCanvas() {
-            drawingCanvas.width = evolutionaryTimeline.offsetWidth;
-            drawingCanvas.height = evolutionaryTimeline.offsetHeight;
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        }        
     </script>
 </body>
 </html>
