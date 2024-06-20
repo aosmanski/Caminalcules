@@ -22,8 +22,16 @@
             width: 50px;
             height: auto;
             position: absolute;
-            left: 60px;
+            cursor: move;
             top: 25px;
+        }
+        #drawing-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -32,22 +40,121 @@
     <p>Invented by Joseph H. Camin</p>
     <p>Webpage created by Austin B. Osmanski</p>
     
-    <button>Enter Cladogram Drawing Mode</button>
-    <button>Clear Lines</button>
+    <button id="drawing-mode-btn">Enter Cladogram Drawing Mode</button>
+    <button id="clear-lines-btn">Clear Lines</button>
     
     <div class="evolutionary-timeline">
-        <div class="timeline-line">
-            <span class="y-axis-label">0</span>
-            <img class="caminalcule-image" src="images/1.living.0.png" alt="Living Caminalcule 1">
-        </div>
-        <div class="timeline-line">
-            <span class="y-axis-label">1</span>
-            <img class="caminalcule-image" src="images/2.fossil.1.png" alt="Fossil Caminalcule 2">
-        </div>
-        <div class="timeline-line">
-            <span class="y-axis-label">2</span>
-        </div>
-        <!-- Add more timeline lines as needed -->
+        <canvas id="drawing-canvas"></canvas>
+        <!-- Timeline lines will be added here dynamically -->
     </div>
+
+    <script>
+        const evolutionaryTimeline = document.querySelector('.evolutionary-timeline');
+        const drawingCanvas = document.getElementById('drawing-canvas');
+        const ctx = drawingCanvas.getContext('2d');
+        const drawingModeBtn = document.getElementById('drawing-mode-btn');
+        const clearLinesBtn = document.getElementById('clear-lines-btn');
+        let isDrawingMode = false;
+        let isDrawing = false;
+        let startX, startY;
+
+        // Caminalcule data
+        const caminalculeData = [
+            { src: "images/1.living.0.png", alt: "Living Caminalcule 1", mya: 0 },
+            { src: "images/2.living.0.png", alt: "Living Caminalcule 2", mya: 0 },
+            // ... Add all your Caminalcule data here
+            { src: "images/73.fossil.19.png", alt: "Fossil Caminalcule 73", mya: 19 }
+        ];
+
+        // Create timeline lines and add Caminalcule images
+        for (let i = 0; i < 20; i++) {
+            const timelineLine = document.createElement('div');
+            timelineLine.className = 'timeline-line';
+            timelineLine.innerHTML = `<span class="y-axis-label">${i}</span>`;
+            evolutionaryTimeline.appendChild(timelineLine);
+
+            caminalculeData.forEach(caminalcule => {
+                if (caminalcule.mya === i) {
+                    const img = document.createElement('img');
+                    img.src = caminalcule.src;
+                    img.alt = caminalcule.alt;
+                    img.className = 'caminalcule-image';
+                    img.style.left = '60px';
+                    img.draggable = false; // Prevent default dragging
+                    timelineLine.appendChild(img);
+                    img.addEventListener('mousedown', startDragging);
+                }
+            });
+        }
+
+        function startDragging(event) {
+            const img = event.target;
+            const timelineLine = img.closest('.timeline-line');
+            const shiftX = event.clientX - img.getBoundingClientRect().left;
+
+            function moveAt(pageX) {
+                const newLeft = pageX - shiftX - timelineLine.getBoundingClientRect().left;
+                const minLeft = 60;
+                const maxLeft = timelineLine.offsetWidth - img.offsetWidth;
+                img.style.left = Math.max(minLeft, Math.min(newLeft, maxLeft)) + 'px';
+            }
+
+            function onMouseMove(event) {
+                moveAt(event.pageX);
+            }
+
+            document.addEventListener('mousemove', onMouseMove);
+
+            img.onmouseup = function() {
+                document.removeEventListener('mousemove', onMouseMove);
+                img.onmouseup = null;
+            };
+        }
+
+        // Drawing functionality
+        drawingModeBtn.addEventListener('click', () => {
+            isDrawingMode = !isDrawingMode;
+            drawingCanvas.style.pointerEvents = isDrawingMode ? 'auto' : 'none';
+            drawingModeBtn.textContent = isDrawingMode ? 'Exit Cladogram Drawing Mode' : 'Enter Cladogram Drawing Mode';
+        });
+
+        clearLinesBtn.addEventListener('click', () => {
+            ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+        });
+
+        drawingCanvas.addEventListener('mousedown', startDrawing);
+        drawingCanvas.addEventListener('mousemove', draw);
+        drawingCanvas.addEventListener('mouseup', stopDrawing);
+
+        function startDrawing(event) {
+            if (isDrawingMode) {
+                isDrawing = true;
+                [startX, startY] = [event.offsetX, event.offsetY];
+            }
+        }
+
+        function draw(event) {
+            if (!isDrawing) return;
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(event.offsetX, event.offsetY);
+            ctx.strokeStyle = 'navy';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            [startX, startY] = [event.offsetX, event.offsetY];
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function resizeCanvas() {
+            drawingCanvas.width = evolutionaryTimeline.offsetWidth;
+            drawingCanvas.height = evolutionaryTimeline.offsetHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+    </script>
 </body>
 </html>
