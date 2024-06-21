@@ -55,7 +55,7 @@
         const drawingModeBtn = document.getElementById('drawing-mode-btn');
         const clearLinesBtn = document.getElementById('clear-lines-btn');
         let isDrawingMode = false;
-        let isDrawing = false;
+        let startElement = null;
         let startX, startY;
 
         // Caminalcule data
@@ -139,8 +139,7 @@
             timelineLine.className = 'timeline-line';
             timelineLine.innerHTML = `<span class="y-axis-label">${i}</span>`;
             evolutionaryTimeline.appendChild(timelineLine);
-			evolutionaryTimeline.addEventListener('click', startDrawing);
-			
+
             caminalculeData.forEach(caminalcule => {
                 if (caminalcule.mya === i) {
                     const img = document.createElement('img');
@@ -154,106 +153,108 @@
                 }
             });
         }
-			
-		// After the loop that creates timeline lines and adds Caminalcule images
-		resizeCanvas();
 
-		function startDragging(event) {
-		    const img = event.target;
-		    const timelineLine = img.closest('.timeline-line');
-		    const shiftX = event.clientX - img.getBoundingClientRect().left;
-		
-		    function moveAt(pageX) {
-		        const newLeft = pageX - shiftX - timelineLine.getBoundingClientRect().left;
-		        const minLeft = 60;
-		        const maxLeft = timelineLine.offsetWidth - img.offsetWidth;
-		        img.style.left = Math.max(minLeft, Math.min(newLeft, maxLeft)) + 'px';
-		    }
-		
-		    function onMouseMove(event) {
-		        moveAt(event.pageX);
-		
-		        // Check if the mouse is outside the timeline line
-		        const timelineRect = timelineLine.getBoundingClientRect();
-		        if (event.clientY < timelineRect.top || event.clientY > timelineRect.bottom) {
-		            stopDragging();
-		        }
-		    }
-		
-		    function stopDragging() {
-		        document.removeEventListener('mousemove', onMouseMove);
-		        document.removeEventListener('mouseup', stopDragging);
-		    }
-		
-		    document.addEventListener('mousemove', onMouseMove);
-		    document.addEventListener('mouseup', stopDragging);
-		
-		    // Prevent default drag behavior
-		    event.preventDefault();
-		}
+        // Initialize canvas size
+        resizeCanvas();
+
+        function startDragging(event) {
+            if (isDrawingMode) return; // Prevent dragging in drawing mode
+
+            const img = event.target;
+            const timelineLine = img.closest('.timeline-line');
+            const shiftX = event.clientX - img.getBoundingClientRect().left;
+
+            function moveAt(pageX) {
+                const newLeft = pageX - shiftX - timelineLine.getBoundingClientRect().left;
+                const minLeft = 60;
+                const maxLeft = timelineLine.offsetWidth - img.offsetWidth;
+                img.style.left = Math.max(minLeft, Math.min(newLeft, maxLeft)) + 'px';
+            }
+
+            function onMouseMove(event) {
+                moveAt(event.pageX);
+
+                // Check if the mouse is outside the timeline line
+                const timelineRect = timelineLine.getBoundingClientRect();
+                if (event.clientY < timelineRect.top || event.clientY > timelineRect.bottom) {
+                    stopDragging();
+                }
+            }
+
+            function stopDragging() {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', stopDragging);
+            }
+
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', stopDragging);
+
+            // Prevent default drag behavior
+            event.preventDefault();
+        }
 
         // Drawing functionality
-		drawingModeBtn.addEventListener('click', () => {
-		    isDrawingMode = !isDrawingMode;
-		    drawingCanvas.style.pointerEvents = isDrawingMode ? 'auto' : 'none';
-		    drawingModeBtn.textContent = isDrawingMode ? 'Exit Cladogram Drawing Mode' : 'Enter Cladogram Drawing Mode';
-		    evolutionaryTimeline.style.pointerEvents = isDrawingMode ? 'none' : 'auto';
-		});
-		
+        drawingModeBtn.addEventListener('click', () => {
+            isDrawingMode = !isDrawingMode;
+            drawingCanvas.style.pointerEvents = isDrawingMode ? 'auto' : 'none';
+            drawingModeBtn.textContent = isDrawingMode ? 'Exit Cladogram Drawing Mode' : 'Enter Cladogram Drawing Mode';
+            evolutionaryTimeline.style.pointerEvents = isDrawingMode ? 'auto' : 'none';
+        });
+
         clearLinesBtn.addEventListener('click', () => {
             ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
         });
 
-        drawingCanvas.addEventListener('click', startDrawing);
+        evolutionaryTimeline.addEventListener('click', startDrawing);
 
-		let startElement = null;
-		
-		function startDrawing(event) {
-		    if (isDrawingMode) {
-		        const clickedElement = event.target;
-		        if (clickedElement.classList.contains('caminalcule-image')) {
-		            if (!startElement) {
-		                startElement = clickedElement;
-		                [startX, startY] = getImageCenter(clickedElement);
-		            } else {
-		                const endElement = clickedElement;
-		                if (isDifferentTimeline(startElement, endElement)) {
-		                    const [endX, endY] = getImageCenter(endElement);
-		                    drawLine(startX, startY, endX, endY);
-		                    startElement = null;
-		                }
-		            }
-		        }
-		    }
-		}
+        function startDrawing(event) {
+            if (!isDrawingMode) return;
 
-		function getImageCenter(img) {
-		    const rect = img.getBoundingClientRect();
-		    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-		    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-		    return [
-		        rect.left + rect.width / 2 + scrollLeft - evolutionaryTimeline.offsetLeft,
-		        rect.top + rect.height / 2 + scrollTop - evolutionaryTimeline.offsetTop
-		    ];
-		}
-		
-		function isDifferentTimeline(img1, img2) {
-		    return img1.closest('.timeline-line') !== img2.closest('.timeline-line');
-		}
-		
-		function drawLine(x1, y1, x2, y2) {
-		    ctx.beginPath();
-		    ctx.moveTo(x1, y1);
-		    ctx.lineTo(x2, y2);
-		    ctx.strokeStyle = 'navy';
-		    ctx.lineWidth = 2;
-		    ctx.stroke();
-		}
-		
-		function resizeCanvas() {
-		    drawingCanvas.width = evolutionaryTimeline.offsetWidth;
-		    drawingCanvas.height = evolutionaryTimeline.offsetHeight;
-		}
+            const clickedElement = event.target;
+            if (clickedElement.classList.contains('caminalcule-image')) {
+                if (!startElement) {
+                    startElement = clickedElement;
+                    [startX, startY] = getImageCenter(clickedElement);
+                } else {
+                    const endElement = clickedElement;
+                    if (isDifferentTimeline(startElement, endElement)) {
+                        const [endX, endY] = getImageCenter(endElement);
+                        drawLine(startX, startY, endX, endY);
+                        startElement = null;
+                    }
+                }
+            }
+        }
+
+        function getImageCenter(img) {
+            const rect = img.getBoundingClientRect();
+            const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            return [
+                rect.left + rect.width / 2 + scrollLeft - evolutionaryTimeline.offsetLeft,
+                rect.top + rect.height / 2 + scrollTop - evolutionaryTimeline.offsetTop
+            ];
+        }
+
+        function isDifferentTimeline(img1, img2) {
+            return img1.closest('.timeline-line') !== img2.closest('.timeline-line');
+        }
+
+        function drawLine(x1, y1, x2, y2) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = 'navy';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function resizeCanvas() {
+            drawingCanvas.width = evolutionaryTimeline.offsetWidth;
+            drawingCanvas.height = evolutionaryTimeline.offsetHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
     </script>
 </body>
 </html>
