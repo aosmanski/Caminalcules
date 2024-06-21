@@ -154,8 +154,9 @@
             });
         }
 
-        // Initialize canvas size
+        // Initialize canvas size and position
         resizeCanvas();
+        updateCanvasPosition();
 
         function startDragging(event) {
             if (isDrawingMode) return; // Prevent dragging in drawing mode
@@ -221,6 +222,8 @@
                         const [endX, endY] = getImageCenter(endElement);
                         drawLine(startX, startY, endX, endY);
                         startElement = null;
+                    } else {
+                        startElement = null; // Reset if clicked on the same timeline
                     }
                 }
             }
@@ -228,11 +231,10 @@
 
         function getImageCenter(img) {
             const rect = img.getBoundingClientRect();
-            const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const timelineRect = evolutionaryTimeline.getBoundingClientRect();
             return [
-                rect.left + rect.width / 2 + scrollLeft - evolutionaryTimeline.offsetLeft,
-                rect.top + rect.height / 2 + scrollTop - evolutionaryTimeline.offsetTop
+                rect.left + rect.width / 2 - timelineRect.left,
+                rect.top + rect.height / 2 - timelineRect.top
             ];
         }
 
@@ -252,9 +254,17 @@
         function resizeCanvas() {
             drawingCanvas.width = evolutionaryTimeline.offsetWidth;
             drawingCanvas.height = evolutionaryTimeline.offsetHeight;
+            updateCanvasPosition();
+        }
+
+        function updateCanvasPosition() {
+            const rect = evolutionaryTimeline.getBoundingClientRect();
+            drawingCanvas.style.left = `${rect.left}px`;
+            drawingCanvas.style.top = `${rect.top}px`;
         }
 
         window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('scroll', updateCanvasPosition);
     </script>
 </body>
 </html>
