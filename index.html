@@ -139,7 +139,8 @@
             timelineLine.className = 'timeline-line';
             timelineLine.innerHTML = `<span class="y-axis-label">${i}</span>`;
             evolutionaryTimeline.appendChild(timelineLine);
-
+			evolutionaryTimeline.addEventListener('click', startDrawing);
+			
             caminalculeData.forEach(caminalcule => {
                 if (caminalcule.mya === i) {
                     const img = document.createElement('img');
@@ -153,7 +154,9 @@
                 }
             });
         }
-
+			
+		// After the loop that creates timeline lines and adds Caminalcule images
+		resizeCanvas();
 
 		function startDragging(event) {
 		    const img = event.target;
@@ -190,12 +193,13 @@
 		}
 
         // Drawing functionality
-        drawingModeBtn.addEventListener('click', () => {
-            isDrawingMode = !isDrawingMode;
-            drawingCanvas.style.pointerEvents = isDrawingMode ? 'auto' : 'none';
-            drawingModeBtn.textContent = isDrawingMode ? 'Exit Cladogram Drawing Mode' : 'Enter Cladogram Drawing Mode';
-        });
-
+		drawingModeBtn.addEventListener('click', () => {
+		    isDrawingMode = !isDrawingMode;
+		    drawingCanvas.style.pointerEvents = isDrawingMode ? 'auto' : 'none';
+		    drawingModeBtn.textContent = isDrawingMode ? 'Exit Cladogram Drawing Mode' : 'Enter Cladogram Drawing Mode';
+		    evolutionaryTimeline.style.pointerEvents = isDrawingMode ? 'none' : 'auto';
+		});
+		
         clearLinesBtn.addEventListener('click', () => {
             ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
         });
@@ -247,22 +251,8 @@
 		}
 		
 		function resizeCanvas() {
-		    const oldCanvas = drawingCanvas;
-		    drawingCanvas = document.createElement('canvas');
-		    drawingCanvas.id = 'drawing-canvas';
-		    drawingCanvas.style.position = 'absolute';
-		    drawingCanvas.style.top = '0';
-		    drawingCanvas.style.left = '0';
-		    drawingCanvas.style.pointerEvents = isDrawingMode ? 'auto' : 'none';
 		    drawingCanvas.width = evolutionaryTimeline.offsetWidth;
 		    drawingCanvas.height = evolutionaryTimeline.offsetHeight;
-		    ctx = drawingCanvas.getContext('2d');
-		    
-		    // Copy the content from the old canvas
-		    ctx.drawImage(oldCanvas, 0, 0);
-		    
-		    oldCanvas.parentNode.replaceChild(drawingCanvas, oldCanvas);
-		    drawingCanvas.addEventListener('click', startDrawing);
 		}
     </script>
 </body>
