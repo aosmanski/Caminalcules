@@ -25,7 +25,7 @@
             cursor: move;
             top: 25px;
         }
-        #drawing-canvas {
+        #svg-container {
             position: absolute;
             top: 0;
             left: 0;
@@ -44,19 +44,17 @@
     <button id="clear-lines-btn">Clear Lines</button>
     
     <div class="evolutionary-timeline">
-        <canvas id="drawing-canvas"></canvas>
+        <svg id="svg-container"></svg>
         <!-- Timeline lines will be added here dynamically -->
     </div>
 
     <script>
         const evolutionaryTimeline = document.querySelector('.evolutionary-timeline');
-        const drawingCanvas = document.getElementById('drawing-canvas');
-        const ctx = drawingCanvas.getContext('2d');
+        const svgContainer = document.getElementById('svg-container');
         const drawingModeBtn = document.getElementById('drawing-mode-btn');
         const clearLinesBtn = document.getElementById('clear-lines-btn');
         let isDrawingMode = false;
         let startElement = null;
-        let startX, startY;
 
         // Caminalcule data
         const caminalculeData = [
@@ -154,10 +152,6 @@
             });
         }
 
-        // Initialize canvas size and position
-        resizeCanvas();
-        updateCanvasPosition();
-
         function startDragging(event) {
             if (isDrawingMode) return; // Prevent dragging in drawing mode
 
@@ -197,13 +191,14 @@
         // Drawing functionality
         drawingModeBtn.addEventListener('click', () => {
             isDrawingMode = !isDrawingMode;
-            drawingCanvas.style.pointerEvents = isDrawingMode ? 'auto' : 'none';
             drawingModeBtn.textContent = isDrawingMode ? 'Exit Cladogram Drawing Mode' : 'Enter Cladogram Drawing Mode';
             evolutionaryTimeline.style.pointerEvents = isDrawingMode ? 'auto' : 'none';
         });
 
         clearLinesBtn.addEventListener('click', () => {
-            ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+            while (svgContainer.firstChild) {
+                svgContainer.removeChild(svgContainer.firstChild);
+            }
         });
 
         evolutionaryTimeline.addEventListener('click', startDrawing);
@@ -215,12 +210,10 @@
             if (clickedElement.classList.contains('caminalcule-image')) {
                 if (!startElement) {
                     startElement = clickedElement;
-                    [startX, startY] = getImageCenter(clickedElement);
                 } else {
                     const endElement = clickedElement;
                     if (isDifferentTimeline(startElement, endElement)) {
-                        const [endX, endY] = getImageCenter(endElement);
-                        drawLine(startX, startY, endX, endY);
+                        drawLine(startElement, endElement);
                         startElement = null;
                     } else {
                         startElement = null; // Reset if clicked on the same timeline
@@ -229,42 +222,48 @@
             }
         }
 
-        function getImageCenter(img) {
-            const rect = img.getBoundingClientRect();
-            const timelineRect = evolutionaryTimeline.getBoundingClientRect();
-            return [
-                rect.left + rect.width / 2 - timelineRect.left,
-                rect.top + rect.height / 2 - timelineRect.top
-            ];
-        }
-
         function isDifferentTimeline(img1, img2) {
             return img1.closest('.timeline-line') !== img2.closest('.timeline-line');
         }
 
-        function drawLine(x1, y1, x2, y2) {
-            ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
-            ctx.strokeStyle = 'navy';
-            ctx.lineWidth = 2;
-            ctx.stroke();
+        function drawLine(startImg, endImg) {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', '0');
+            line.setAttribute('y1', '0');
+            line.setAttribute('x2', '0');
+            line.setAttribute('y2', '0');
+            line.setAttribute('stroke', 'navy');
+            line.setAttribute('stroke-width', '2');
+            svgContainer.appendChild(line);
+
+            function updateLine() {
+                const startRect = startImg.getBoundingClientRect();
+                const endRect = endImg.getBoundingClientRect();
+                const svgRect = svgContainer.getBoundingClientRect();
+
+                const x1 = startRect.left + startRect.width / 2 - svgRect.left;
+                const y1 = startRect.top + startRect.height / 2 - svgRect.top;
+                const x2 = endRect.left + endRect.width / 2 - svgRect.left;
+                const y2 = endRect.top + endRect.height / 2 - svgRect.top;
+
+                line.setAttribute('x1', x1);
+                line.setAttribute('y1', y1);
+                line.setAttribute('x2', x2);
+                line.setAttribute('y2', y2);
+            }
+
+            updateLine();
+            window.addEventListener('scroll', updateLine);
+            window.addEventListener('resize', updateLine);
         }
 
-        function resizeCanvas() {
-            drawingCanvas.width = evolutionaryTimeline.offsetWidth;
-            drawingCanvas.height = evolutionaryTimeline.offsetHeight;
-            updateCanvasPosition();
+        function resizeSvg() {
+            svgContainer.setAttribute('width', evolutionaryTimeline.offsetWidth);
+            svgContainer.setAttribute('height', evolutionaryTimeline.offsetHeight);
         }
 
-        function updateCanvasPosition() {
-            const rect = evolutionaryTimeline.getBoundingClientRect();
-            drawingCanvas.style.left = `${rect.left}px`;
-            drawingCanvas.style.top = `${rect.top}px`;
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-        window.addEventListener('scroll', updateCanvasPosition);
+        window.addEventListener('resize', resizeSvg);
+        resizeSvg();
     </script>
 </body>
 </html>
