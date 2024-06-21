@@ -42,6 +42,7 @@
     
     <button id="drawing-mode-btn">Enter Cladogram Drawing Mode</button>
     <button id="clear-lines-btn">Clear Lines</button>
+    <button id="remove-line-btn">Remove Individual Line</button>
     
     <div class="evolutionary-timeline">
         <svg id="svg-container"></svg>
@@ -53,7 +54,9 @@
         const svgContainer = document.getElementById('svg-container');
         const drawingModeBtn = document.getElementById('drawing-mode-btn');
         const clearLinesBtn = document.getElementById('clear-lines-btn');
+        const removeLineBtn = document.getElementById('remove-line-btn');
         let isDrawingMode = false;
+        let isRemoveLineMode = false;
         let startElement = null;
 
         // Caminalcule data
@@ -128,7 +131,6 @@
             { src: "images/76.fossil.6.png", alt: "Fossil Caminalcule 76", mya: 6 },
             { src: "images/77.fossil.10.png", alt: "Fossil Caminalcule 77", mya: 10 },
             { src: "images/9.fossil.3.png", alt: "Fossil Caminalcule 9", mya: 3 },
-            { src: "images/9.living.0.png", alt: "Living Caminalcule 9", mya: 0 },
         ];
 
         // Create timeline lines and add Caminalcule images
@@ -153,7 +155,7 @@
         }
 
         function startDragging(event) {
-            if (isDrawingMode) return; // Prevent dragging in drawing mode
+            if (isDrawingMode || isRemoveLineMode) return; // Prevent dragging in drawing or remove line mode
 
             const img = event.target;
             const timelineLine = img.closest('.timeline-line');
@@ -191,14 +193,28 @@
         // Drawing functionality
         drawingModeBtn.addEventListener('click', () => {
             isDrawingMode = !isDrawingMode;
+            isRemoveLineMode = false; // Exit remove line mode if it's active
             drawingModeBtn.textContent = isDrawingMode ? 'Exit Cladogram Drawing Mode' : 'Enter Cladogram Drawing Mode';
+            removeLineBtn.textContent = 'Remove Individual Line';
             evolutionaryTimeline.style.pointerEvents = isDrawingMode ? 'auto' : 'none';
+            svgContainer.style.pointerEvents = 'none';
         });
 
         clearLinesBtn.addEventListener('click', () => {
-            while (svgContainer.firstChild) {
-                svgContainer.removeChild(svgContainer.firstChild);
+            if (confirm('Are you sure you want to clear all lines?')) {
+                while (svgContainer.firstChild) {
+                    svgContainer.removeChild(svgContainer.firstChild);
+                }
             }
+        });
+
+        removeLineBtn.addEventListener('click', () => {
+            isRemoveLineMode = !isRemoveLineMode;
+            isDrawingMode = false; // Exit drawing mode if it's active
+            removeLineBtn.textContent = isRemoveLineMode ? 'Exit Remove Line Mode' : 'Remove Individual Line';
+            drawingModeBtn.textContent = 'Enter Cladogram Drawing Mode';
+            evolutionaryTimeline.style.pointerEvents = 'auto';
+            svgContainer.style.pointerEvents = isRemoveLineMode ? 'auto' : 'none';
         });
 
         evolutionaryTimeline.addEventListener('click', startDrawing);
@@ -235,6 +251,13 @@
             line.setAttribute('stroke', 'navy');
             line.setAttribute('stroke-width', '2');
             svgContainer.appendChild(line);
+
+            line.addEventListener('click', (event) => {
+                if (isRemoveLineMode) {
+                    event.stopPropagation();
+                    svgContainer.removeChild(line);
+                }
+            });
 
             function updateLine() {
                 const startRect = startImg.getBoundingClientRect();
