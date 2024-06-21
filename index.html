@@ -200,39 +200,70 @@
             ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
         });
 
-        drawingCanvas.addEventListener('mousedown', startDrawing);
-        drawingCanvas.addEventListener('mousemove', draw);
-        drawingCanvas.addEventListener('mouseup', stopDrawing);
+        drawingCanvas.addEventListener('click', startDrawing);
 
-        function startDrawing(event) {
-            if (isDrawingMode) {
-                isDrawing = true;
-                [startX, startY] = [event.offsetX, event.offsetY];
-            }
-        }
+		let startElement = null;
+		
+		function startDrawing(event) {
+		    if (isDrawingMode) {
+		        const clickedElement = event.target;
+		        if (clickedElement.classList.contains('caminalcule-image')) {
+		            if (!startElement) {
+		                startElement = clickedElement;
+		                [startX, startY] = getImageCenter(clickedElement);
+		            } else {
+		                const endElement = clickedElement;
+		                if (isDifferentTimeline(startElement, endElement)) {
+		                    const [endX, endY] = getImageCenter(endElement);
+		                    drawLine(startX, startY, endX, endY);
+		                    startElement = null;
+		                }
+		            }
+		        }
+		    }
+		}
 
-        function draw(event) {
-            if (!isDrawing) return;
-            ctx.beginPath();
-            ctx.moveTo(startX, startY);
-            ctx.lineTo(event.offsetX, event.offsetY);
-            ctx.strokeStyle = 'navy';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            [startX, startY] = [event.offsetX, event.offsetY];
-        }
-
-        function stopDrawing() {
-            isDrawing = false;
-        }
-
-        function resizeCanvas() {
-            drawingCanvas.width = evolutionaryTimeline.offsetWidth;
-            drawingCanvas.height = evolutionaryTimeline.offsetHeight;
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+		function getImageCenter(img) {
+		    const rect = img.getBoundingClientRect();
+		    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+		    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+		    return [
+		        rect.left + rect.width / 2 + scrollLeft - evolutionaryTimeline.offsetLeft,
+		        rect.top + rect.height / 2 + scrollTop - evolutionaryTimeline.offsetTop
+		    ];
+		}
+		
+		function isDifferentTimeline(img1, img2) {
+		    return img1.closest('.timeline-line') !== img2.closest('.timeline-line');
+		}
+		
+		function drawLine(x1, y1, x2, y2) {
+		    ctx.beginPath();
+		    ctx.moveTo(x1, y1);
+		    ctx.lineTo(x2, y2);
+		    ctx.strokeStyle = 'navy';
+		    ctx.lineWidth = 2;
+		    ctx.stroke();
+		}
+		
+		function resizeCanvas() {
+		    const oldCanvas = drawingCanvas;
+		    drawingCanvas = document.createElement('canvas');
+		    drawingCanvas.id = 'drawing-canvas';
+		    drawingCanvas.style.position = 'absolute';
+		    drawingCanvas.style.top = '0';
+		    drawingCanvas.style.left = '0';
+		    drawingCanvas.style.pointerEvents = isDrawingMode ? 'auto' : 'none';
+		    drawingCanvas.width = evolutionaryTimeline.offsetWidth;
+		    drawingCanvas.height = evolutionaryTimeline.offsetHeight;
+		    ctx = drawingCanvas.getContext('2d');
+		    
+		    // Copy the content from the old canvas
+		    ctx.drawImage(oldCanvas, 0, 0);
+		    
+		    oldCanvas.parentNode.replaceChild(drawingCanvas, oldCanvas);
+		    drawingCanvas.addEventListener('click', startDrawing);
+		}
     </script>
 </body>
 </html>
