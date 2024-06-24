@@ -35,8 +35,9 @@
         }
         .cladogram-line {
             stroke: navy;
-            stroke-width: 2;
+            stroke-width: 10;
             cursor: pointer;
+            pointer-events: all;
         }
     </style>
 </head>
@@ -198,12 +199,8 @@
         // Drawing functionality
         drawingModeBtn.addEventListener('click', () => {
             isDrawingMode = !isDrawingMode;
-            isRemoveLineMode = false; // Exit remove line mode if it's active
-            drawingModeBtn.textContent = isDrawingMode ? 'Exit Cladogram Drawing Mode' : 'Enter Cladogram Drawing Mode';
-            removeLineBtn.textContent = 'Remove Individual Line';
-            evolutionaryTimeline.style.pointerEvents = isDrawingMode ? 'auto' : 'none';
-            svgContainer.style.pointerEvents = 'none';
-            updateDraggableState();
+            isRemoveLineMode = false;
+            updateButtonStates();
         });
 
         clearLinesBtn.addEventListener('click', () => {
@@ -216,15 +213,16 @@
 
         removeLineBtn.addEventListener('click', () => {
             isRemoveLineMode = !isRemoveLineMode;
-            isDrawingMode = false; // Exit drawing mode if it's active
-            removeLineBtn.textContent = isRemoveLineMode ? 'Exit Remove Line Mode' : 'Remove Individual Line';
-            drawingModeBtn.textContent = 'Enter Cladogram Drawing Mode';
-            evolutionaryTimeline.style.pointerEvents = 'auto';
-            svgContainer.style.pointerEvents = isRemoveLineMode ? 'auto' : 'none';
-            updateDraggableState();
+            isDrawingMode = false;
+            updateButtonStates();
         });
 
-        function updateDraggableState() {
+        function updateButtonStates() {
+            drawingModeBtn.textContent = isDrawingMode ? 'Exit Cladogram Drawing Mode' : 'Enter Cladogram Drawing Mode';
+            removeLineBtn.textContent = isRemoveLineMode ? 'Exit Remove Line Mode' : 'Remove Individual Line';
+            svgContainer.style.pointerEvents = isRemoveLineMode ? 'auto' : 'none';
+            evolutionaryTimeline.style.pointerEvents = isDrawingMode ? 'auto' : 'none';
+            
             const images = document.querySelectorAll('.caminalcule-image');
             images.forEach(img => {
                 img.style.cursor = isDrawingMode || isRemoveLineMode ? 'default' : 'move';
