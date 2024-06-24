@@ -33,6 +33,11 @@
             height: 100%;
             pointer-events: none;
         }
+        .cladogram-line {
+            stroke: navy;
+            stroke-width: 2;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -41,7 +46,7 @@
     <p>Webpage created by Austin B. Osmanski</p>
     
     <button id="drawing-mode-btn">Enter Cladogram Drawing Mode</button>
-    <button id="clear-lines-btn">Clear Lines</button>
+    <button id="clear-lines-btn">Clear All Lines</button>
     <button id="remove-line-btn">Remove Individual Line</button>
     
     <div class="evolutionary-timeline">
@@ -198,6 +203,7 @@
             removeLineBtn.textContent = 'Remove Individual Line';
             evolutionaryTimeline.style.pointerEvents = isDrawingMode ? 'auto' : 'none';
             svgContainer.style.pointerEvents = 'none';
+            updateDraggableState();
         });
 
         clearLinesBtn.addEventListener('click', () => {
@@ -215,7 +221,15 @@
             drawingModeBtn.textContent = 'Enter Cladogram Drawing Mode';
             evolutionaryTimeline.style.pointerEvents = 'auto';
             svgContainer.style.pointerEvents = isRemoveLineMode ? 'auto' : 'none';
+            updateDraggableState();
         });
+
+        function updateDraggableState() {
+            const images = document.querySelectorAll('.caminalcule-image');
+            images.forEach(img => {
+                img.style.cursor = isDrawingMode || isRemoveLineMode ? 'default' : 'move';
+            });
+        }
 
         evolutionaryTimeline.addEventListener('click', startDrawing);
 
@@ -244,12 +258,11 @@
 
         function drawLine(startImg, endImg) {
             const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('class', 'cladogram-line');
             line.setAttribute('x1', '0');
             line.setAttribute('y1', '0');
             line.setAttribute('x2', '0');
             line.setAttribute('y2', '0');
-            line.setAttribute('stroke', 'navy');
-            line.setAttribute('stroke-width', '2');
             svgContainer.appendChild(line);
 
             line.addEventListener('click', (event) => {
